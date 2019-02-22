@@ -92,12 +92,17 @@ export default {
         if (result) {
           var self=this;
           this.$http
-            .post("http://192.168.8.175:8080/helpdeskconna/ws/usuario/login", {
+            .post("/usuario/login", {
               nit: this.data.nit,
               contrasenia: this.data.password
             })
             .then(response => {
-              alert("Correcto: " + JSON.stringify(response.data));
+              console.log('TOKEN ANTES DE HACER LOGIN ************ \n'+localStorage.getItem('t-a'))
+              localStorage.setItem('data-user',response.data)
+              localStorage.setItem('t-a',response.headers.authorization)
+              console.log('TOKEN DESPUES DE HACER LOGIN ************ \n'+localStorage.getItem('t-a'))
+              this.$emit('loginCorrecto')
+              alert("LOGIN CORRECTO!!!")
             })
             .catch(function(error) {
               switch (error.response.status) {

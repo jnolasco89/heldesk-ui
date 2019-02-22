@@ -1,6 +1,6 @@
 <template>
   <v-app>
-     <!-- ============= Toolbar ================= --> 
+    <!-- ============= Toolbar ================= -->
     <v-toolbar app clipped-left color="primary">
       <v-spacer></v-spacer>
       <a class="d-flex router-link-active">
@@ -14,7 +14,7 @@
 
       <div>
         <v-menu offset-y>
-          <v-btn color="primary" slot="activator">
+          <v-btn color="primary" slot="activator" @click="verLocalStorage">
             <v-icon>account_circle</v-icon>Jose Nolasco
           </v-btn>
         </v-menu>
@@ -24,13 +24,13 @@
         </v-btn>
       </div>
     </v-toolbar>
-    <!-- ============ Content ================= --> 
+    <!-- ============ Content ================= -->
     <v-content>
       <v-container fluid fill-height>
-        <router-view></router-view>
+        <router-view v-on:loginCorrecto="cargarVistaPrincipal"></router-view>
       </v-container>
     </v-content>
-    <!-- ============ Footer =================== --> 
+    <!-- ============ Footer =================== -->
     <v-footer app>
       <v-layout justify-center row wrap>
         <v-flex lighten-2 text-xs-center xs12>
@@ -47,6 +47,26 @@
 </template>
 <script>
 export default {
-    name: 'Layout'
-}
+  name: "Layout",
+  methods: {
+    verLocalStorage: function() {
+      var token = localStorage.getItem("t-a");
+      var dataUser = localStorage.getItem("data-user");
+      /*
+         alert("TOKEN: "+token);
+         alert("data user: "+ JSON.stringify(dataUser));
+         */
+      console.log(
+        "Token: " + token + " Data ususario: " + JSON.stringify(dataUser)
+      );
+     
+    },
+    cargarVistaPrincipal: function() {
+      
+      this.$router.push({ name: "Marcaciones" });
+      
+      //  alert("deberia cargar la nueva vista")
+    }
+  }
+};
 </script>
