@@ -2,7 +2,7 @@
   <v-layout align-center justify-center row fill-height>
     <v-flex xs10 sm6 md4 lg3 xl3>
       <v-card class="elevation-12">
-        <v-toolbar>
+        <v-toolbar dark color="primary">
           <v-toolbar-title>Ingreso</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
@@ -32,12 +32,12 @@
               :error-messages="errors.collect('data.password')"
               required
             ></v-text-field>
-            <a>Restablecer contraseña</a>
+            <a @click="irAresetPass"> Restablecer contraseña</a>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-layout justify-center>
-            <v-btn @click="login">Ingresar
+            <v-btn @click="login" color="primary" small>Ingresar
               <v-icon right dark>arrow_forward</v-icon>
             </v-btn>
           </v-layout>
@@ -85,8 +85,12 @@ export default {
   },
   mounted() {
     this.$validator.localize("en", this.dictionary);
+    this.$emit('componenteCargado',3)
   },
   methods: {
+    irAresetPass:function(){
+      this.$router.push({name:'ResetearPassword'})
+    },
     login: function() {
       this.$validator.validateAll().then(result => {
         if (result) {
@@ -97,12 +101,9 @@ export default {
               contrasenia: this.data.password
             })
             .then(response => {
-              console.log('TOKEN ANTES DE HACER LOGIN ************ \n'+localStorage.getItem('t-a'))
               localStorage.setItem('data-user',response.data)
               localStorage.setItem('t-a',response.headers.authorization)
-              console.log('TOKEN DESPUES DE HACER LOGIN ************ \n'+localStorage.getItem('t-a'))
               this.$emit('loginCorrecto')
-              alert("LOGIN CORRECTO!!!")
             })
             .catch(function(error) {
               switch (error.response.status) {
