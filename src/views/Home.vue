@@ -1,12 +1,12 @@
 <template>
-    <h1>Vista home donde cargaran todos los demas componentes</h1>
+  <router-view></router-view>
 </template>
 <script>
 export default {
-    name:'Home',
-    mounted(){
-        this.$emit('componenteCargado',5)
-    }
-}
+  name: "Home",
+  mounted() {
+    this.$emit("componenteCargado", 5);
+  }
+};
 </script>
 

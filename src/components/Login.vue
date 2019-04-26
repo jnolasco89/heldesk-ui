@@ -15,7 +15,7 @@
               return-masked-value
               v-model="data.nit"
               data-vv-name="data.nit"
-              v-validate="'required|max:17'"
+              v-validate="'required|length:17'"
               :error-messages="errors.collect('data.nit')"
               required
             ></v-text-field>
@@ -32,19 +32,35 @@
               :error-messages="errors.collect('data.password')"
               required
             ></v-text-field>
-            <a @click="irAresetPass"> Restablecer contraseña</a>
+            <a @click="irAresetPass">Restablecer contraseña</a>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-layout justify-center>
-            <v-btn @click="login" color="primary" small>Ingresar
+            <v-btn @click="login" color="primary" small>
+              Ingresar
               <v-icon right dark>arrow_forward</v-icon>
             </v-btn>
           </v-layout>
         </v-card-actions>
       </v-card>
-      <v-alert v-show="ui.loginFallido" :value="true" color="error" icon="warning" outline>{{ui.msjError}}</v-alert>
+      <v-alert v-show="ui.loginFallido" :value="true" color="error" icon="warning">{{ui.msjError}}</v-alert>
+      <v-expansion-panel v-show="ui.detallesError">
+        <v-expansion-panel-content expand-icon="keyboard_arrow_down">
+          <template v-slot:header>
+            <div>Detalle error</div>
+          </template>
+          <v-card>
+            <v-card-text class="grey lighten-3">{{ui.msjDetallesError}}</v-card-text>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
     </v-flex>
+
+    <!--
+    <v-dialog id="dialogAutenticacion" v-model="ui.dialogLoading" max-width persistent>
+      <v-progress-circular :size="70" :width="9" color="amber" indeterminate></v-progress-circular>
+    </v-dialog>-->
   </v-layout>
 </template>
 <script>
@@ -55,8 +71,11 @@ export default {
       ui: {
         passVisible: false,
         mascarNit: "####-######-###-#",
-        loginFallido:false,
-        msjError:''
+        loginFallido: false,
+        msjError: "",
+        msjDetallesError: "",
+        //dialogLoading: false,
+        detallesError: false
       },
       data: {
         nit: "",
@@ -72,7 +91,9 @@ export default {
             required: function() {
               return "El campo NIT es requerido";
             },
-            max: "El campo NIT solo puede tener 17 caracteres numericos"
+            length: function() {
+              return "El campo NIT debe tener 14 digitos";
+            }
           },
           "data.password": {
             required: function() {
@@ -85,37 +106,51 @@ export default {
   },
   mounted() {
     this.$validator.localize("en", this.dictionary);
-    this.$emit('componenteCargado',3)
+    this.$emit("componenteCargado", 3);
   },
   methods: {
-    irAresetPass:function(){
-      this.$router.push({name:'ResetearPassword'})
+    irAresetPass: function() {
+      this.$router.push({ name: "ResetearPassword" });
     },
     login: function() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          var self=this;
+          //this.ui.dialogLoading = true;
+          this.$emit("mostrarCargando", true);
+
+          var self = this;
           this.$http
             .post("/usuario/login", {
               nit: this.data.nit,
               contrasenia: this.data.password
             })
             .then(response => {
-              localStorage.setItem('data-user',response.data)
-              localStorage.setItem('t-a',response.headers.authorization)
-              this.$emit('loginCorrecto')
+              localStorage.setItem("data-user", response.data);
+              localStorage.setItem("t-a", response.headers.authorization);
+              this.$emit("loginCorrecto");
+              this.$emit("mostrarCargando", false);
             })
             .catch(function(error) {
               switch (error.response.status) {
                 case 401:
-                  self.ui.msjError=error.response.data.detalle;
-                  self.ui.loginFallido=true;
+                  self.ui.msjError = error.response.data.error;
+                  self.ui.loginFallido = true;
                   break;
                 default:
-                  self.ui.msjError="Ha ocurrido un error  "+error.response.data;
+                  self.ui.detallesError = true;
+                  var descripcion = error.response.descripcion;
+                  var error = error.response.descripcion;
+                  var tipo = error.response.tipo;
 
-                break;
+                  self.ui.msjError = error;
+                  self.ui.msjDetallesError =
+                    "Ha ocurrido un error: " + tipo + " , " + descripcion;
+
+                  break;
               }
+
+              //self.ui.dialogLoading = false;
+              this.$emit("mostrarCargando", false);
             });
 
           return;
@@ -125,3 +160,10 @@ export default {
   }
 };
 </script>
+<style>
+.v-dialog {
+  overflow: hidden !important;
+  box-shadow: 0 0 0 0 !important;
+  -webkit-box-shadow: 0 0 0 0 !important;
+}
+</style>

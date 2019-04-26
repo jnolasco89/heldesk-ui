@@ -13,6 +13,14 @@ Vue.config.productionTip = false
 ======================================================*/
 //Agregando VeeValidate
 Vue.use(VeeValidate)
+
+const moment = require('moment')
+require('moment/locale/es')
+ 
+Vue.use(require('vue-moment'), {
+    moment
+})
+
 //Agregando y configurando tema para Vuetify
 Vue.use(Vuetify, {
   theme: {

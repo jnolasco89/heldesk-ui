@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginCpt from '@/components/Login'
-import MarcacionesCpt from '@/components/Marcaciones'
+import MarcacionesCpt from '@/components/ConsultaMarcaciones/MarcacionesIndex'
 import MsjSesionRequeridaCpt from '@/components/MsjSesionRequerida'
 import RegistroCpt from '@/components/Registro'
 import ResetPassCpt from '@/components/ResetPass'
@@ -41,13 +41,21 @@ export default new VueRouter({
             path: '/home',
             name: 'Home',
             component: HomeCpt,
-            meta: { requiresAuth: true }
-        },
+            meta: { requiresAuth: true },
+            children:[
+                {
+                    path:'consulta-marcaciones',
+                    name:'ConsultaMarcaciones',
+                    component:MarcacionesCpt
+                }
+            ]
+        }
+        /*,
         {
             path: '/marcaciones',
             name: 'Marcaciones',
             component: MarcacionesCpt,
             meta: { requiresAuth: true }
-        }
+        }*/
     ]
 })

@@ -16,7 +16,7 @@
             <v-icon>home</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>HomeEEE</v-list-tile-title>
+            <v-list-tile-title>Marcaciones</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile>
@@ -24,7 +24,7 @@
             <v-icon>contact_mail</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Contact</v-list-tile-title>
+            <v-list-tile-title>Reservaciones</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -51,7 +51,7 @@
      =============================================== -->
     <v-content>
       <v-container fluid fill-height>
-        <router-view v-on:loginCorrecto="cargarVistaPrincipal" v-on:componenteCargado="configurarElementosVisibles"></router-view>
+        <router-view v-on:loginCorrecto="cargarVistaPrincipal" v-on:componenteCargado="configurarElementosVisibles" v-on:mostrarCargando="mostrarCargando"></router-view>
       </v-container>
     </v-content>
 
@@ -69,7 +69,12 @@
         </v-flex>
       </v-layout>
     </v-footer>
+
+    <v-dialog id="dialogAutenticacion" v-model="ui.dialogLoading" max-width persistent>
+      <v-progress-circular :size="70" :width="9" color="amber" indeterminate></v-progress-circular>
+    </v-dialog>
   </v-app>
+  
 </template>
 <script>
 export default {
@@ -79,11 +84,16 @@ export default {
       ui:{
         navBarVisible:false,
         menuLateralVisible:false,
-        footerVisible:false
+        footerVisible:false,
+        dialogLoading: false,
       }
     }
   },
   methods: {
+    mostrarCargando:function(mostrar){
+      this.ui.dialogLoading=mostrar;
+      //alert("mostrar cargando "+mostrar);
+    },
     irARegistrarse:function(){
       this.$router.push({name:'Registro'})
     },
