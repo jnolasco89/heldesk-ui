@@ -116,7 +116,8 @@ export default {
       this.$validator.validateAll().then(result => {
         if (result) {
           //this.ui.dialogLoading = true;
-          this.$emit("mostrarCargando", true);
+          //this.$emit("mostrarCargando", true);
+          this.$eventBus.$emit("mostrarCargando",true);
 
           var self = this;
           this.$http
@@ -127,8 +128,9 @@ export default {
             .then(response => {
               localStorage.setItem("data-user", response.data);
               localStorage.setItem("t-a", response.headers.authorization);
-              this.$emit("loginCorrecto");
-              this.$emit("mostrarCargando", false);
+              this.$emit("loginCorrecto","ConsultaMarcaciones");
+              //this.$emit("mostrarCargando", false);
+              this.$eventBus.$emit("mostrarCargando",false);
             })
             .catch(function(error) {
               switch (error.response.status) {
@@ -150,7 +152,8 @@ export default {
               }
 
               //self.ui.dialogLoading = false;
-              this.$emit("mostrarCargando", false);
+              //this.$emit("mostrarCargando", false);
+              this.$eventBus.$emit("mostrarCargando",false);
             });
 
           return;

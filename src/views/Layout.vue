@@ -48,10 +48,11 @@
 
     <!-- ===========================================
                     CONTENIDO PRINCIPAL
+                     v-on:mostrarCargando="mostrarCargando"
      =============================================== -->
     <v-content>
       <v-container fluid fill-height>
-        <router-view v-on:loginCorrecto="cargarVistaPrincipal" v-on:componenteCargado="configurarElementosVisibles" v-on:mostrarCargando="mostrarCargando"></router-view>
+        <router-view v-on:loginCorrecto="cargarVistaPrincipal" v-on:componenteCargado="configurarElementosVisibles"></router-view>
       </v-container>
     </v-content>
 
@@ -89,6 +90,9 @@ export default {
       }
     }
   },
+  created(){
+    this.$eventBus.$on('mostrarCargando',this.mostrarCargando)
+  },
   methods: {
     mostrarCargando:function(mostrar){
       this.ui.dialogLoading=mostrar;
@@ -97,8 +101,9 @@ export default {
     irARegistrarse:function(){
       this.$router.push({name:'Registro'})
     },
-    cargarVistaPrincipal: function() {
-      this.$router.push({ name: "Home"});
+    cargarVistaPrincipal: function(rutaDestino) {
+      //this.$router.push({ name: "Home"});
+      this.$router.push({ name: rutaDestino});
     },
     configurarElementosVisibles: function(confVisibles){
       /*

@@ -46,7 +46,14 @@ export default {
   },
   data() {
     return {
-      dataEmpleado:null,
+       dataEmpleado: {
+          codigoMarcacion: "",
+          nit: "",
+          nombre: "",
+          departamento: "",
+          cargo: "",
+          ubicacion: ""
+        },
       test: {
         dataEmpleado: {
           codigoMarcacion: "192.168.132.1",
@@ -81,15 +88,16 @@ export default {
   },
   methods:{
     consultarMarcaciones:function(mes,anio){
-      this.$emit("mostrarCargando",true);
-      alert(mes+" "+anio);
+      this.$eventBus.$emit("mostrarCargando",true);
+      
+      var self=this;
       this.$http
     .post("usuario/marcaciones/416/"+mes+"/"+anio)
     .then(response => {
-      this.$emit("mostrarCargando",false);
+        this.$eventBus.$emit("mostrarCargando",false);
         var registro=response.data;
         
-        this.dataEmpleado= {
+        self.dataEmpleado= {
           codigoMarcacion: registro.empleado.codMarcacion,
           nit: registro.empleado.nit,
           nombre: registro.empleado.pnombre,
@@ -100,9 +108,10 @@ export default {
         
     })
     .catch(function(error){
-      this.$emit("mostrarCargando",false);
+      this.$eventBus.$emit("mostrarCargando",false);
       alert("ocurrio un error");
     })
+
     }
   }
 };

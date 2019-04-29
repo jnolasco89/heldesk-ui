@@ -79,6 +79,8 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+Vue.prototype.$eventBus=new Vue()
+
 new Vue({
   router,
   render: h => h(App),

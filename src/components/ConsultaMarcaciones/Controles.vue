@@ -50,9 +50,11 @@ export default {
       fecha: new Date().toISOString().substr(0, 10),
       datePickerVisible: false,
       usuarios: [
+        /*
         { text: "Jose Nolasco", callback: () => console.log("jn") },
         { text: "Edgardo Rodriguez", callback: () => console.log("ed") },
         { text: "Juan Perez", callback: () => console.log("jp") }
+        */
       ]
     };
   },
