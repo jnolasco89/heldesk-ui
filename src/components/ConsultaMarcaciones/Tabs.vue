@@ -31,12 +31,6 @@ export default {
       default: function() {
         return null;
       }
-    },
-    filtrosTabla: {
-      type: Array,
-      default: function() {
-        return [];
-      }
     }
   },
   components: {
@@ -53,7 +47,14 @@ export default {
     },
     filasTabla: function() {
       if (this.dataTabla != null) {
-        return this.dataTabla.filasdata;
+        return this.dataTabla.data;
+      } else {
+        return [];
+      }
+    },
+    filtrosTabla:function(){
+       if (this.dataTabla != null) {
+        return this.dataTabla.filtros;
       } else {
         return [];
       }

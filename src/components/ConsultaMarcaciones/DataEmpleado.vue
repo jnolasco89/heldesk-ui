@@ -14,37 +14,42 @@
           <v-list-tile>
             <v-list-tile-content class="align-left">Codigo de marcación</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.codigoMarcacion}}</b>
+           <!--
+                    <v-text-field
+              v-model="dataEmpleado.codigoMarcacion"
+              readonly
+            ></v-text-field>-->
+              <b>{{dataEmpleado.codigoMarcacion}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
             <v-list-tile-content class="align-left">NIT</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.nit}}</b>
+              <b>{{dataEmpleado.nit}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
             <v-list-tile-content class="align-left">Nombre</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.nombre}}</b>
+              <b>{{dataEmpleado.nombre}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
             <v-list-tile-content class="align-left">Departamento</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.departamento}}</b>
+              <b>{{dataEmpleado.departamento}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
             <v-list-tile-content class="align-left">Cargo</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.cargo}}</b>
+              <b>{{dataEmpleado.cargo}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
             <v-list-tile-content class="align-left">Ubicación</v-list-tile-content>
             <v-list-tile-content class="align-end">
-              <b>{{empleado.ubicacion}}</b>
+              <b>{{dataEmpleado.ubicacion}}</b>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -57,7 +62,7 @@
 export default {
   name: "marcacion-data-empleado",
   props: {
-    datosEmpleado: {
+    dataEmpleado: {
       type: Object,
       default: function() {
         return {
@@ -79,21 +84,28 @@ export default {
       default: null
     }
   },
+  /*
   data() {
     return {
-      empleado: this.datosEmpleado,
+      empleado: this.dataEmpleado,
       anioAmostrar: this.anio,
       mesAmostrar: this.mes
     };
   },
+  */
+  watch:{
+    empleado: function(val){
+      this.empleado=val;
+    }
+  },
   computed: {
     leyendaMarcacion: function() {
-      if (this.anioAmostrar > 0 && this.mesAmostrar != null) {
+      if (this.anio > 0 && this.mes != null) {
         return (
           "Marcaciones del mes de " +
-          this.mesAmostrar +
+          this.mes +
           " de " +
-          this.anioAmostrar
+          this.anio
         );
       } else {
         return "Sin información (ui)";

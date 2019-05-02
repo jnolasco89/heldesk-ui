@@ -13,8 +13,8 @@
     </v-container>
     <v-card-text>
       <v-data-table
-        :headers="cabecerasAmostrar"
-        :items="dataAmostrar"
+        :headers="cabeceras"
+        :items="data"
         class="elevation-1"
         hide-actions
       >

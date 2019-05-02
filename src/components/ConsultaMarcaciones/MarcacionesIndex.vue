@@ -8,9 +8,9 @@
     <v-layout row align-start justify-center>
       <v-flex xs12 sm12 md6>
         <marcacion-data-empleado
-          :datos-empleado="dataEmpleado"
-          :anio="test.anio"
-          :mes="test.mes"
+          :data-empleado="dataEmpleado"
+          :mes="mesConsulta"
+          :anio="anioConsulta"
         ></marcacion-data-empleado>
       </v-flex>
     </v-layout>
@@ -22,7 +22,7 @@
               <descriptor-de-colores :descriptores="test.descriptores"></descriptor-de-colores>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <marcacion-tabs></marcacion-tabs>
+              <marcacion-tabs :data-tabla="dataTablaMarcaciones"></marcacion-tabs>
             </v-flex>
           </v-layout>
         </v-container>
@@ -47,22 +47,18 @@ export default {
   data() {
     return {
        dataEmpleado: {
-          codigoMarcacion: "",
-          nit: "",
-          nombre: "",
-          departamento: "",
-          cargo: "",
-          ubicacion: ""
+          codigoMarcacion: "a",
+          nit: "a",
+          nombre: "a",
+          departamento: "a",
+          cargo: "a",
+          ubicacion: "a"
         },
+        dataTablaMarcaciones:null,
+        anioConsulta:0,
+        mesConsulta:"",
       test: {
-        dataEmpleado: {
-          codigoMarcacion: "192.168.132.1",
-          nit: "0101-060389-101-4",
-          nombre: "Jose Nolasco",
-          departamento: "Informacion",
-          cargo: "Programador",
-          ubicacion: "San Salvador, San Salvador"
-        },
+        
         anio: 2018,
         mes: "Diciembre",
         descriptores: [
@@ -95,21 +91,88 @@ export default {
     .post("usuario/marcaciones/416/"+mes+"/"+anio)
     .then(response => {
         this.$eventBus.$emit("mostrarCargando",false);
-        var registro=response.data;
+        //let registro=response.data;
+        let empleado=response.data.empleado;
+        let nombreCompleto=(empleado.pnombre.length>0?empleado.pnombre+" ":"")+
+                           (empleado.snombre.length>0?empleado.snombre+" ":"")+
+                           (empleado.tnombre.length>0?empleado.tnombre+" ":"")+
+                           (empleado.papellido.length>0?empleado.papellido+" ":"")+
+                           (empleado.sapellido.length>0?empleado.sapellido+" ":"")+
+                           (empleado.tapellido.length>0?empleado.tapellido+" ":"");
+
+        let meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        self.mesConsulta=meses[mes-1];
+        self.anioConsulta=anio*1;
         
         self.dataEmpleado= {
-          codigoMarcacion: registro.empleado.codMarcacion,
-          nit: registro.empleado.nit,
-          nombre: registro.empleado.pnombre,
-          departamento: registro.empleado.departamento.nombre,
-          cargo: registro.empleado.cargo.nombre,
-          ubicacion: registro.ubicacion
+          codigoMarcacion: empleado.codMarcacion,
+          nit: empleado.nit,
+          nombre: nombreCompleto,
+          departamento: empleado.departamento.nombre,
+          cargo: empleado.cargo.nombre,
+          ubicacion: empleado.ubicacion
+        };
+
+/*
+        self.marcasMes=meses[0];
+        alert(JSON.stringify(dataMes));
+        */
+       
+       let dataParaTabla=[];
+       let diasMes=response.data.meses[0].diasMes;
+
+       diasMes.forEach(function(marca){
+         let marcasManana="";
+         let marcasTarde="";
+         //console.log(JSON.stringify(marca));
+        
+          for(var i=0;i<marca.marcaciones.length;i++){
+              var hora=(self.$moment(marca.marcaciones[i]).format("HH"))*1;
+              
+              if(hora<=12){
+                marcasManana+=self.$moment(marca.marcaciones[i]).format("HH:mm:ss A")+" ";
+              }else{
+                marcasTarde+=self.$moment(marca.marcaciones[i]).format("HH:mm:ss A")+" ";
+              }
+
+              if(marcasManana.length==0){
+                 marcasManana="Sin marcaciones"; 
+              }
+
+              if(marcasTarde.length==0){
+                 marcasManana="Sin marcaciones"; 
+              }
+          }
+
+          dataParaTabla.push({
+            fecha:self.$moment(marca.fecha).format("DD-MM-YYYY"),
+            dia:marca.diaDeLaSemana,
+            manana:marcasManana,
+            tarde:marcasTarde
+          });
+          
+       });
+
+      console.log(JSON.stringify(dataParaTabla));
+
+        self.dataTablaMarcaciones={
+          cabeceras:[{ texto: "Fecha", value: "fecha" },{ texto: "Dia", value: "dia" },{ texto: "Manana", value: "manana" },{ texto: "Tarde", value: "tarde" }],
+          filtros:["Todo","Laborado","Inasistencia"],
+          data: dataParaTabla
+          /*
+          [
+            {fecha:"01/01/01",dia:"miercoles",manana:"uno",tarde:"fggh"},
+            {fecha:"01/01/01",dia:"miercoles",manana:"dos",tarde:"fggh"},
+            {fecha:"01/01/01",dia:"miercoles",manana:"tres",tarde:"fggh"},
+            {fecha:"01/01/01",dia:"miercoles",manana:"cuatro",tarde:"fggh"},
+          ]
+          */
         };
         
     })
     .catch(function(error){
-      this.$eventBus.$emit("mostrarCargando",false);
-      alert("ocurrio un error");
+      self.$eventBus.$emit("mostrarCargando",false);
+      alert("ocurrio un error "+error);
     })
 
     }
