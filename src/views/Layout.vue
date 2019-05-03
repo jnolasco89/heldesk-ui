@@ -104,6 +104,9 @@ export default {
     cargarVistaPrincipal: function(rutaDestino) {
       //this.$router.push({ name: "Home"});
       this.$router.push({ name: rutaDestino});
+
+      
+      
     },
     configurarElementosVisibles: function(confVisibles){
       /*

@@ -126,7 +126,18 @@ export default {
               contrasenia: this.data.password
             })
             .then(response => {
-              localStorage.setItem("data-user", response.data);
+              
+              let dataUser={
+                id:response.data.id,
+                nit:response.data.nit,
+                codigoMarcacion:response.data.codigoAsistencia,
+                pnombre:response.data.pnombre,
+                snombre:response.data.snombre,
+                papellido:response.data.papellido,
+                sapellido:response.data.sapellido,
+              };
+              
+              localStorage.setItem("data-user", JSON.stringify( dataUser));
               localStorage.setItem("t-a", response.headers.authorization);
               this.$emit("loginCorrecto","ConsultaMarcaciones");
               //this.$emit("mostrarCargando", false);

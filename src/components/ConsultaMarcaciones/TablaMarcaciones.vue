@@ -62,12 +62,14 @@ export default {
       }
     }
   },
+  /*
   data() {
     return {
       cabecerasAmostrar: this.cabeceras,
       dataAmostrar: this.data
     };
   },
+  */
   computed: {
     filtrosAmostrar: function() {
       let filtrosAretornar = [
