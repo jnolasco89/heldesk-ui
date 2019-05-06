@@ -14,14 +14,15 @@
        <tabla-marcaciones :cabeceras="cabecerasTabla" :filtros="filtrosTabla" :data="filasTabla"></tabla-marcaciones>
       </v-tab-item>
       <v-tab-item :value="'vista-calendario'">
-        <!--<full-calendario></full-calendario>-->
+        
+        <calendario :eventos="dataCalendario"></calendario>
       </v-tab-item>
     </v-tabs-items>
   </v-tabs>
 </template>
 <script>
 import tablaMarcaciones from "@/components/ConsultaMarcaciones/TablaMarcaciones";
-//import FullCalendario from "@/components/FullCalendario";
+import calendario from "@/components/Genericos/Calendario";
 
 export default {
   name: "marcacion-tabs",
@@ -31,11 +32,17 @@ export default {
       default: function() {
         return null;
       }
+    },
+      dataCalendario: {
+      type: Array,
+      default: function() {
+        return [];
+      }
     }
   },
   components: {
-   tablaMarcaciones//,
-  //  FullCalendario
+   tablaMarcaciones,
+   calendario
   },
   computed: {
     cabecerasTabla: function() {

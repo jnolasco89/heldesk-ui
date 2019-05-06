@@ -3,17 +3,9 @@
     <v-container grid-list-md>
       <v-layout row wrap align-center>
         <v-flex xs4 sm4 md4>
-          <v-select
-            :items="filtrosAmostrar"
-            item-value="id"
-            item-text="texto"
-            v-model="filtroSeleccionado"
-            label="Filtrar por"
-            prepend-icon="filter_list"
-          ></v-select>
+          <v-select :items="filtrosAmostrar" label="Filtrar por" prepend-icon="filter_list"></v-select>
         </v-flex>
-        <v-btn color="primary" small>
-          Imprimir
+        <v-btn color="primary" small>Imprimir
           <v-icon right dark>local_printshop</v-icon>
         </v-btn>
         <v-flex xs4 sm4 md4></v-flex>
@@ -22,7 +14,7 @@
     <v-card-text>
       <v-data-table
         :headers="cabeceras"
-        :items="marcacionesFiltradas"
+        :items="data"
         class="elevation-1"
         hide-actions
       >
@@ -31,12 +23,9 @@
             <th v-for="cabecera in propiedades.headers" :key="cabecera.value">{{cabecera.texto}}</th>
           </tr>
         </template>
-        <template v-slot:items="propiedades">
-          <tr v-bind:class="[propiedades.item.tipo.clase]">
-            <td>{{propiedades.item.dia}}</td>
-            <td>{{propiedades.item.fecha}}</td>
-            <td>{{propiedades.item.manana.marcaciones}}</td>
-            <td>{{propiedades.item.tarde.marcaciones}}</td>
+        <template slot="items" slot-scope="propiedades">
+          <tr>
+            <td v-for="dataFila in propiedades.item" :key="dataFila.value">{{dataFila}}</td>
           </tr>
         </template>
         <template slot="no-data">
@@ -73,15 +62,14 @@ export default {
       }
     }
   },
+  /*
   data() {
     return {
-      filtroSeleccionado: 0
-      /*
       cabecerasAmostrar: this.cabeceras,
       dataAmostrar: this.data
-      */
     };
   },
+  */
   computed: {
     filtrosAmostrar: function() {
       let filtrosAretornar = [
@@ -97,43 +85,7 @@ export default {
       }
 
       return filtrosAretornar;
-    },
-    marcacionesFiltradas: function() {
-      let filtradas = [];
-
-      if (this.filtroSeleccionado == 0) {
-        filtradas = this.data;
-      }
-      else {
-        let self=this;
-        this.data.forEach(function(item) {
-          if (item.tipo.id == self.filtroSeleccionado) {
-            filtradas.push(item);
-          }
-        });
-      }
-      return filtradas;
     }
   }
 };
 </script>
-<style>
-.sin-marcaciones td {
-  background-color: red;
-  color: white;
-}
-
-.una-marcacion-periodo td {
-  background-color: rgb(255, 164, 32);
-  color: white;
-}
-
-.marcaciones-en-un-periodo td {
-  background-color: yellow;
-}
-
-.marcaciones-full td {
-  background-color: green;
-  color: white;
-}
-</style>
