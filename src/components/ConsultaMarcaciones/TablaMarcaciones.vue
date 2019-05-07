@@ -35,8 +35,8 @@
           <tr v-bind:class="[propiedades.item.tipo.clase]">
             <td>{{propiedades.item.dia}}</td>
             <td>{{propiedades.item.fecha}}</td>
-            <td>{{propiedades.item.manana.marcaciones}}</td>
-            <td>{{propiedades.item.tarde.marcaciones}}</td>
+            <td>{{marcacionesTxtDia(propiedades.item.manana)}}</td>
+            <td>{{marcacionesTxtDia(propiedades.item.tarde)}}</td>
           </tr>
         </template>
         <template slot="no-data">
@@ -103,9 +103,8 @@ export default {
 
       if (this.filtroSeleccionado == 0) {
         filtradas = this.data;
-      }
-      else {
-        let self=this;
+      } else {
+        let self = this;
         this.data.forEach(function(item) {
           if (item.tipo.id == self.filtroSeleccionado) {
             filtradas.push(item);
@@ -113,6 +112,20 @@ export default {
         });
       }
       return filtradas;
+    }
+  },
+  methods: {
+    marcacionesTxtDia: function(marcaciones) {
+      let marcacionesTxt = "";
+      marcaciones.forEach(function(marcacion) {
+        marcacionesTxt += marcacion + ", ";
+      });
+
+      marcacionesTxt =
+        marcacionesTxt.length > 0
+          ? marcacionesTxt.substring(0, marcacionesTxt.length - 2)
+          : "Sin marcaciones";
+      return marcacionesTxt;
     }
   }
 };

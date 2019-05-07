@@ -22,7 +22,11 @@
               <descriptor-de-colores :descriptores="descriptores"></descriptor-de-colores>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <marcacion-tabs :data-tabla="dataTablaMarcaciones" :data-calendario="dataCalendarioMarcaciones"></marcacion-tabs>
+              <marcacion-tabs
+                :data-tabla="dataTablaMarcaciones"
+                :data-calendario="dataCalendarioMarcaciones"
+                :today-calendar="fechaInicioCalendario"
+              ></marcacion-tabs>
             </v-flex>
           </v-layout>
         </v-container>
@@ -55,9 +59,10 @@ export default {
         ubicacion: ""
       },
       dataTablaMarcaciones: null,
-      dataCalendarioMarcaciones:[],
+      dataCalendarioMarcaciones: [],
       anioConsulta: 0,
       mesConsulta: "",
+      fechaInicioCalendario: this.$moment(new Date()).format("YYYY-MM-DD"),
       verRegistroMarcaciones: false,
       descriptores: [
         {
@@ -82,28 +87,22 @@ export default {
   methods: {
     consultarMarcaciones: function(mes, anio) {
       this.$eventBus.$emit("mostrarCargando", true);
-      let user = JSON.parse(localStorage.getItem("data-user"));
-
+      let userCookie = JSON.parse(localStorage.getItem("data-user"));
       var self = this;
+
       this.$http
         .post(
-          "usuario/marcaciones/" + user.codigoMarcacion + "/" + mes + "/" + anio
+          "usuario/marcaciones/" +
+            userCookie.codigoMarcacion +
+            "/" +
+            mes +
+            "/" +
+            anio
         )
         .then(response => {
-          //Se muestra la animacion de cargando
-          this.$eventBus.$emit("mostrarCargando", false);
-
-          //Se obtiene la data relacionada con el empleado
-          let empleado = response.data.empleado;
-          let nombreCompleto =
-            (empleado.pnombre.length > 0 ? empleado.pnombre + " " : "") +
-            (empleado.snombre.length > 0 ? empleado.snombre + " " : "") +
-            (empleado.tnombre.length > 0 ? empleado.tnombre + " " : "") +
-            (empleado.papellido.length > 0 ? empleado.papellido + " " : "") +
-            (empleado.sapellido.length > 0 ? empleado.sapellido + " " : "") +
-            (empleado.tapellido.length > 0 ? empleado.tapellido + " " : "");
-
-          //Seteando los valores del mes
+          //********************************************************
+          //Declarando variables utilitarias
+          //********************************************************
           let meses = [
             "Enero",
             "Febrero",
@@ -118,10 +117,21 @@ export default {
             "Noviembre",
             "Diciembre"
           ];
+          let empleado = response.data.empleado;
+          let nombreCompleto =
+            (empleado.pnombre.length > 0 ? empleado.pnombre + " " : "") +
+            (empleado.snombre.length > 0 ? empleado.snombre + " " : "") +
+            (empleado.tnombre.length > 0 ? empleado.tnombre + " " : "") +
+            (empleado.papellido.length > 0 ? empleado.papellido + " " : "") +
+            (empleado.sapellido.length > 0 ? empleado.sapellido + " " : "") +
+            (empleado.tapellido.length > 0 ? empleado.tapellido + " " : "");
+
+          //********************************************************
+          //Seteando las variables locales del componente
+          //********************************************************
+          self.fechaInicioCalendario=self.$moment(new Date(anio,mes-1,1)).format("YYYY-MM-DD");
           self.mesConsulta = meses[mes - 1];
           self.anioConsulta = anio * 1;
-
-          //Seteando la data del empleado
           self.dataEmpleado = {
             codigoMarcacion: empleado.codMarcacion,
             nit: empleado.nit,
@@ -131,118 +141,83 @@ export default {
             ubicacion: empleado.ubicacion
           };
 
+          //********************************************************
           //Procesando la data de las marcaciones
+          //********************************************************
           let dataParaTabla = [];
           let dataParaCalendario = [];
-          let diasMes = response.data.meses[0].diasMes;
+          let diasMarcaciones = response.data.meses[0].diasMes;
 
-          diasMes.forEach(function(marca) {
-            let marcasManana = {
-              totMarcaciones: 0,
-              marcaciones: "",
-              arrayMarcaciones: []
-            };
-            let marcasTarde = {
-              totMarcaciones: 0,
-              marcaciones: "",
-              arrayMarcaciones: []
-            };
+          diasMarcaciones.forEach(function(diaMarcacion) {
+            let marcasManana = [],
+              marcasTarde = [];
 
-            for (var i = 0; i < marca.marcaciones.length; i++) {
-              var hora = self.$moment(marca.marcaciones[i]).format("HH") * 1;
+            diaMarcacion.marcaciones.forEach(function(marcacion) {
+              //HH para formato de 24 horas
+              //hh para formato de 12 horas
+              let horaMarcacion = self.$moment(marcacion).format("HH") * 1;
 
-              if (hora <= 12) {
-                marcasManana.totMarcaciones++;
-                marcasManana.marcaciones +=
-                  self.$moment(marca.marcaciones[i]).format("hh:mm A") + ", ";
-                marcasManana.arrayMarcaciones.push(
-                  self.$moment(marca.marcaciones[i]).format("hh:mm A")
-                );
+              if (horaMarcacion <= 12) {
+                marcasManana.push(self.$moment(marcacion).format("hh:mm A"));
               } else {
-                marcasTarde.totMarcaciones++;
-                marcasTarde.marcaciones +=
-                  self.$moment(marca.marcaciones[i]).format("hh:mm A") + ", ";
-                marcasTarde.arrayMarcaciones.push(
-                  self.$moment(marca.marcaciones[i]).format("hh:mm A")
-                );
+                marcasTarde.push(self.$moment(marcacion).format("hh:mm A"));
               }
-            }
-
-            if (marcasManana.totMarcaciones == 0) {
-              marcasManana.marcaciones = "Sin marcaciones";
-            } else {
-              marcasManana.marcaciones = marcasManana.marcaciones.substring(
-                0,
-                marcasManana.marcaciones.length - 2
-              );
-            }
-
-            if (marcasTarde.totMarcaciones == 0) {
-              marcasTarde.marcaciones = "Sin marcaciones";
-            } else {
-              marcasTarde.marcaciones = marcasTarde.marcaciones.substring(
-                0,
-                marcasTarde.marcaciones.length - 2
-              );
-            }
+            }); //Fin forEach marcaciones
 
             let tipoMarcacion = { id: 0, clase: "" };
-            if (
-              marcasManana.totMarcaciones == 0 &&
-              marcasTarde.totMarcaciones == 0
-            ) {
+            if (marcasManana.length == 0 && marcasTarde.length == 0) {
               //Sin marcaciones
               tipoMarcacion.id = 1;
               tipoMarcacion.clase = "sin-marcaciones";
             } else if (
-              (marcasManana.totMarcaciones == 1 &&
-                marcasTarde.totMarcaciones == 0) ||
-              (marcasManana.totMarcaciones == 0 &&
-                marcasTarde.totMarcaciones == 1)
+              (marcasManana.length == 1 && marcasTarde.length == 0) ||
+              (marcasManana.length == 0 && marcasTarde.length == 1)
             ) {
               //Una marcacion ya sea en la mañana o en la tarde
               tipoMarcacion.id = 2;
               tipoMarcacion.clase = "una-marcacion-periodo";
             } else if (
-              (marcasManana.totMarcaciones > 0 &&
-                marcasTarde.totMarcaciones == 0) ||
-              (marcasManana.totMarcaciones == 0 &&
-                marcasTarde.totMarcaciones > 0)
+              (marcasManana.length > 0 && marcasTarde.length == 0) ||
+              (marcasManana.length == 0 && marcasTarde.length > 0)
             ) {
               //Varias marcaciones solo en un tiempo del dia mañana o tarde
               tipoMarcacion.id = 3;
               tipoMarcacion.clase = "marcaciones-en-un-periodo";
-            } else if (
-              marcasManana.totMarcaciones > 0 &&
-              marcasTarde.totMarcaciones > 0
-            ) {
+            } else if (marcasManana.length > 0 && marcasTarde.length > 0) {
               //Maraciones en todo el dia
               tipoMarcacion.id = 4;
               tipoMarcacion.clase = "marcaciones-full";
             }
 
-            dataParaCalendario.push({
-              turno: "Mañana",
-              marcaciones: marcasManana.arrayMarcaciones,
-              fecha: self.$moment(marca.fecha).format("YYYY-MM-DD")
-            });
-            dataParaCalendario.push({
-              turno: "Tarde",
-              marcaciones: marcasTarde.arrayMarcaciones,
-              fecha: self.$moment(marca.fecha).format("YYYY-MM-DD")
-            });
+            marcasManana =
+              marcasManana.length > 0 ? marcasManana : ["Sin marcaciones"];
+            marcasTarde =
+              marcasTarde.length > 0 ? marcasTarde : ["Sin marcaciones"];
 
-            delete marcasManana.arrayMarcaciones;
-            delete marcasTarde.arrayMarcaciones;
+            //Agregando las marcaciones a la data
+            dataParaCalendario.push({
+              tipo:tipoMarcacion,
+              key: "manana-"+self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+              turno: "Mañana",
+              marcaciones: marcasManana,
+              fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
+            });
+            dataParaCalendario.push({
+              tipo:tipoMarcacion,
+              key: "tarde-"+self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+              turno: "Tarde",
+              marcaciones: marcasTarde,
+              fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
+            });
 
             dataParaTabla.push({
               tipo: tipoMarcacion,
-              dia: marca.diaDeLaSemana,
-              fecha: self.$moment(marca.fecha).format("DD-MM-YYYY"),
+              dia: diaMarcacion.diaDeLaSemana,
+              fecha: self.$moment(diaMarcacion.fecha).format("DD-MM-YYYY"),
               manana: marcasManana,
               tarde: marcasTarde
             });
-          });
+          }); //Fin forEach diaMarcacion
 
           self.dataTablaMarcaciones = {
             cabeceras: [
@@ -261,9 +236,10 @@ export default {
             data: dataParaTabla
           };
 
-          self.dataCalendarioMarcaciones=dataParaCalendario;
+          self.dataCalendarioMarcaciones = dataParaCalendario;
 
-        })
+          this.$eventBus.$emit("mostrarCargando", false);
+        }) //Fin de THEN
         .catch(function(error) {
           self.$eventBus.$emit("mostrarCargando", false);
           alert("ocurrio un error " + error);

@@ -15,7 +15,7 @@
       </v-tab-item>
       <v-tab-item :value="'vista-calendario'">
         
-        <calendario :eventos="dataCalendario"></calendario>
+        <calendario :eventos="dataCalendario" :today="todayCalendar"></calendario>
       </v-tab-item>
     </v-tabs-items>
   </v-tabs>
@@ -33,10 +33,16 @@ export default {
         return null;
       }
     },
-      dataCalendario: {
+    dataCalendario: {
       type: Array,
       default: function() {
         return [];
+      }
+    },
+    todayCalendar:{
+      type: String,
+      default: function(){
+        return this.$moment().format("YYYY-MM-DD");
       }
     }
   },
