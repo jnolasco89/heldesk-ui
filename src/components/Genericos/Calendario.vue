@@ -89,22 +89,14 @@ export default {
   margin-bottom: 1px;
 }
 
- .listaMarcaciones{
-   position: relative!important;
- }
- .listaMarcaciones li{
-   float: left!important;
-   width: 100%;
- }
-
 .listaMarcaciones {
   list-style: none;
   text-align: left;
-  border: solid 1px black;
 }
 
 .listaMarcaciones li{
-  border: solid 1px black;
+  margin-left: -30%;
+  text-align: center;
 }
 
 .sin-marcaciones {
@@ -118,7 +110,7 @@ export default {
 
 .una-marcacion-periodo{
   background-color: rgb(255, 164, 32);
-  color: white;
+  color: black;
 }
 
 .marcaciones-en-un-periodo{
@@ -130,6 +122,9 @@ export default {
   color: white;
 }
 
+.marcaciones-full hr{
+  border-color: white;
+}
 </style>
 
 

@@ -12,7 +12,7 @@
             prepend-icon="filter_list"
           ></v-select>
         </v-flex>
-        <v-btn color="primary" small>
+        <v-btn color="primary" small @click="imprimirReporteTabla">
           Imprimir
           <v-icon right dark>local_printshop</v-icon>
         </v-btn>
@@ -126,6 +126,36 @@ export default {
           ? marcacionesTxt.substring(0, marcacionesTxt.length - 2)
           : "Sin marcaciones";
       return marcacionesTxt;
+    },
+     imprimirReporteTabla:function(){
+      alert("clcik");
+       this.$eventBus.$emit("mostrarCargando", true);
+
+       this.$http
+       .get('usuario/reporte-marcaciones/416/1/2018',{
+         responseType: 'blob'
+       })
+       .then((response)=>{
+         /*
+         const url=window.URL.createObjectURL(new Blob([response.data]));
+         const link=document.createElement('a');
+         link.href=url;
+         link.setAttribute('download','file.pdf');
+         document.body.appendChild(link);
+         link.click();
+         */
+        const url=window.URL.createObjectURL(new Blob([response.data],{type:'application/pdf'}));
+        const link=document.createElement('a');
+         link.href=url;
+         link.setAttribute('download','file.pdf');
+         document.body.appendChild(link);
+         link.click();
+         window.open(url);
+       })
+       .catch(function(error) {
+          self.$eventBus.$emit("mostrarCargando", false);
+          alert("ocurrio un error " + error);
+        });
     }
   }
 };
@@ -138,11 +168,12 @@ export default {
 
 .una-marcacion-periodo td {
   background-color: rgb(255, 164, 32);
-  color: white;
+  color: black;
 }
 
 .marcaciones-en-un-periodo td {
   background-color: yellow;
+  color: black;
 }
 
 .marcaciones-full td {
