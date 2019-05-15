@@ -44,6 +44,16 @@
         CONNA
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-toolbar-items>
+        <v-btn flat>
+          <v-icon>account_circle</v-icon>
+           {{ui.nickName}}
+        </v-btn>
+        <v-btn flat>
+          <v-icon>power_settings_new</v-icon>
+          Salir
+        </v-btn>
+      </v-toolbar-items>
     </v-toolbar>
 
     <!-- ===========================================
@@ -87,13 +97,36 @@ export default {
         menuLateralVisible:false,
         footerVisible:false,
         dialogLoading: false,
+        nickName:"Usuario"
       }
     }
   },
   created(){
+    this.armarNickName();
     this.$eventBus.$on('mostrarCargando',this.mostrarCargando)
   },
   methods: {
+    armarNickName:function(){
+        let nickName="";
+        let user=JSON.parse(localStorage.getItem("data-user"));
+        let nombres=[user.pnombre,user.snombre,user.tnombre,user.papellido,user.sapellido,user.tapellido]
+
+        for(var i=0;i<nombres.length;i++){
+            if(i<2){
+                if(nombres[i].length>0){
+                    nickName=nombres[i];
+                    i=2;
+                }
+            }else{
+                if(nombres[i].length>0){
+                    nickName=nickName+" "+nombres[i];
+                    i=5;
+                }
+            }
+        }
+            
+        this.ui.nickName=nickName;
+    },
     mostrarCargando:function(mostrar){
       this.ui.dialogLoading=mostrar;
       //alert("mostrar cargando "+mostrar);
@@ -104,9 +137,6 @@ export default {
     cargarVistaPrincipal: function(rutaDestino) {
       //this.$router.push({ name: "Home"});
       this.$router.push({ name: rutaDestino});
-
-      
-      
     },
     configurarElementosVisibles: function(confVisibles){
       /*

@@ -1,7 +1,7 @@
 <template>
   <v-layout row wrap align-center justify-center>
-    <v-flex xs6 sm6 md4>
-      <v-select :items="usuarios" label="Seleccione un usuario" prepend-icon="supervisor_account"></v-select>
+    <v-flex xs6 sm6 md4 v-if="verListaSupervisiones">
+      <v-select :items="supervisiones" item-value="codAsistencia" item-text="nombreCompleto" v-model="selectedEmpleado" label="Seleccione un usuario" prepend-icon="supervisor_account" @change="cambioSeleccion"></v-select>
     </v-flex>
     <v-flex xs6 sm6x md4>
       <v-menu
@@ -44,11 +44,20 @@
 <script>
 export default {
     name: 'controles-marcaciones',
+    props:{
+       supervisiones:{
+         type:Array,
+         default:function(){
+           return [];
+         }
+       }
+    },
     data() {
     return {
       fechaActual: new Date(),
       fecha: new Date().toISOString().substr(0, 10),
       datePickerVisible: false,
+      selectedEmpleado:0,
       usuarios: [
         /*
         { text: "Jose Nolasco", callback: () => console.log("jn") },
@@ -61,6 +70,9 @@ export default {
   computed: {
     fechaFormateada: function() {
       return this.$moment(this.fecha).format("MMMM - YYYY");
+    },
+    verListaSupervisiones:function(){
+      return this.supervisiones.length>0?true:false;
     }
   },
   methods:{
@@ -68,7 +80,18 @@ export default {
       var mes=this.$moment(this.fecha).format("MM");
       var anio=this.$moment(this.fecha).format("YYYY");
       this.$emit("consultarMarcaciones",mes,anio);
+    },
+    cambioSeleccion:function(){
+      this.$emit("cambioSeleccion",this.selectedEmpleado);
     }
+  },
+  mounted(){
+      let user=JSON.parse(localStorage.getItem("data-user"));
+      if(user!=null){
+        this.selectedEmpleado=user.id;
+      }else if(this.supervisiones.length>0){
+        this.selectedEmpleado=this.supervisiones[0].id;   
+      }
   }
 }
 </script>

@@ -2,7 +2,7 @@
   <v-container grid-list-md text-xs-center>
     <v-layout row align-start justify-center fill-height>
       <v-flex xs12 sm12 md12>
-        <controles-marcacion v-on:consultarMarcaciones="consultarMarcaciones"></controles-marcacion>
+        <controles-marcacion v-on:cambioSeleccion="actualizarSelectedEmpleado" v-on:consultarMarcaciones="consultarMarcaciones" :supervisiones="dataSupervisiones" v-if="isLoadSupervisiones"></controles-marcacion>
       </v-flex>
     </v-layout>
     <v-layout row align-start justify-center>
@@ -50,6 +50,9 @@ export default {
   },
   data() {
     return {
+      selectedEmpleado:0,
+      isLoadSupervisiones:false,
+      dataSupervisiones:[],
       dataEmpleado: {
         codigoMarcacion: "",
         nit: "",
@@ -84,16 +87,47 @@ export default {
       ]
     };
   },
+  mounted(){
+    this.$eventBus.$emit("mostrarCargando",false);
+    
+    let user= JSON.parse(localStorage.getItem("data-user"))
+    this.$http
+    .get("usuario/supervisiones/"+user.id)
+    .then(response=>{
+        this.isLoadSupervisiones=true;
+        this.dataSupervisiones=response.data;
+
+        if(response.data.length>0){
+          this.dataSupervisiones.unshift(user);
+        }
+    
+    })
+    .catch(error=>{
+          alert("ocurrio un error " + error);
+    })
+  },
   methods: {
+    actualizarSelectedEmpleado:function(id){
+        this.selectedEmpleado=id;
+    },
     consultarMarcaciones: function(mes, anio) {
       this.$eventBus.$emit("mostrarCargando", true);
-      let userCookie = JSON.parse(localStorage.getItem("data-user"));
+      let codigoMarcacion=0;
+      
+      if(this.dataSupervisiones.length>0 && this.isLoadSupervisiones){
+         codigoMarcacion= this.selectedEmpleado;
+      }else{
+        let userCookie = JSON.parse(localStorage.getItem("data-user"));
+        codigoMarcacion=userCookie.codigoMarcacion;
+      }
+
+      
       var self = this;
 
       this.$http
         .post(
           "usuario/marcaciones/" +
-            userCookie.codigoMarcacion +
+            codigoMarcacion +
             "/" +
             mes +
             "/" +

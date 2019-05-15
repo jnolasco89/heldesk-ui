@@ -56,11 +56,6 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-flex>
-
-    <!--
-    <v-dialog id="dialogAutenticacion" v-model="ui.dialogLoading" max-width persistent>
-      <v-progress-circular :size="70" :width="9" color="amber" indeterminate></v-progress-circular>
-    </v-dialog>-->
   </v-layout>
 </template>
 <script>
@@ -74,7 +69,6 @@ export default {
         loginFallido: false,
         msjError: "",
         msjDetallesError: "",
-        //dialogLoading: false,
         detallesError: false
       },
       data: {
@@ -115,8 +109,6 @@ export default {
     login: function() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          //this.ui.dialogLoading = true;
-          //this.$emit("mostrarCargando", true);
           this.$eventBus.$emit("mostrarCargando",true);
 
           var self = this;
@@ -130,20 +122,23 @@ export default {
               let dataUser={
                 id:response.data.id,
                 nit:response.data.nit,
-                codigoMarcacion:response.data.codigoAsistencia,
+                codAsistencia:response.data.codigoAsistencia,
                 pnombre:response.data.pnombre,
                 snombre:response.data.snombre,
+                tnombre:response.data.tnombre,
                 papellido:response.data.papellido,
                 sapellido:response.data.sapellido,
+                tapellido:response.data.tapellido,
+                nombreCompleto:response.data.nombreCompleto
               };
               
               localStorage.setItem("data-user", JSON.stringify( dataUser));
               localStorage.setItem("t-a", response.headers.authorization);
               this.$emit("loginCorrecto","ConsultaMarcaciones");
-              //this.$emit("mostrarCargando", false);
-              this.$eventBus.$emit("mostrarCargando",false);
             })
             .catch(function(error) {
+              this.$eventBus.$emit("mostrarCargando",false);
+
               switch (error.response.status) {
                 case 401:
                   self.ui.msjError = error.response.data.error;
@@ -161,10 +156,6 @@ export default {
 
                   break;
               }
-
-              //self.ui.dialogLoading = false;
-              //this.$emit("mostrarCargando", false);
-              this.$eventBus.$emit("mostrarCargando",false);
             });
 
           return;
