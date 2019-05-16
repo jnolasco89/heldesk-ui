@@ -118,7 +118,7 @@ export default {
          codigoMarcacion= this.selectedEmpleado;
       }else{
         let userCookie = JSON.parse(localStorage.getItem("data-user"));
-        codigoMarcacion=userCookie.codigoMarcacion;
+        codigoMarcacion=userCookie.id;
       }
 
       

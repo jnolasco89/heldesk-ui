@@ -1,7 +1,7 @@
 <template>
   <v-layout row wrap align-center justify-center>
     <v-flex xs6 sm6 md4 v-if="verListaSupervisiones">
-      <v-select :items="supervisiones" item-value="codAsistencia" item-text="nombreCompleto" v-model="selectedEmpleado" label="Seleccione un usuario" prepend-icon="supervisor_account" @change="cambioSeleccion"></v-select>
+      <v-select :items="supervisiones" item-value="id" item-text="nombreCompleto" v-model="selectedEmpleado" label="Seleccione un usuario" prepend-icon="supervisor_account" @change="cambioSeleccion"></v-select>
     </v-flex>
     <v-flex xs6 sm6x md4>
       <v-menu
