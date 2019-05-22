@@ -41,7 +41,7 @@ import DescriptorDeColores from "@/components/ConsultaMarcaciones/DescriptorDeCo
 import MarcacionTabs from "@/components/ConsultaMarcaciones/Tabs";
 
 export default {
-  name: "Marcaciones",
+  name: "Index-Marcaciones",
   components: {
     ControlesMarcacion,
     MarcacionDataEmpleado,
