@@ -2,7 +2,7 @@
   <v-container grid-list-md text-xs-center>
     <v-layout row align-start justify-center fill-height>
       <v-flex xs12 sm12 md12>
-        <controles-marcacion v-on:cambioSeleccion="actualizarSelectedEmpleado" v-on:consultarMarcaciones="consultarMarcaciones" :supervisiones="dataSupervisiones" v-if="isLoadSupervisiones"></controles-marcacion>
+        <controles-marcacion v-on:cambioSeleccion="actualizarSelectedEmpleado" v-on:consultarMarcaciones="consultarMarcaciones" :supervisiones="dataSupervisiones" v-if="isLoadSupervisiones" :inituserselected="selectedEmpleado"></controles-marcacion>
       </v-flex>
     </v-layout>
     <v-layout row align-start justify-center>
@@ -88,7 +88,7 @@ export default {
     };
   },
   mounted(){
-    this.$eventBus.$emit("mostrarCargando",false);
+    
     
     let user= JSON.parse(localStorage.getItem("data-user"))
     this.$http
@@ -96,14 +96,17 @@ export default {
     .then(response=>{
         this.isLoadSupervisiones=true;
         this.dataSupervisiones=response.data;
+        this.selectedEmpleado=user.id;
 
         if(response.data.length>0){
           this.dataSupervisiones.unshift(user);
         }
     
+        this.$eventBus.$emit("mostrarCargando",false);
     })
     .catch(error=>{
           alert("ocurrio un error " + error);
+          this.$eventBus.$emit("mostrarCargando",false);
     })
   },
   methods: {
@@ -112,22 +115,21 @@ export default {
     },
     consultarMarcaciones: function(mes, anio) {
       this.$eventBus.$emit("mostrarCargando", true);
-      let codigoMarcacion=0;
+      let idEmpleado=0;
       
       if(this.dataSupervisiones.length>0 && this.isLoadSupervisiones){
-         codigoMarcacion= this.selectedEmpleado;
+         idEmpleado= this.selectedEmpleado;
       }else{
         let userCookie = JSON.parse(localStorage.getItem("data-user"));
-        codigoMarcacion=userCookie.id;
+        idEmpleado=userCookie.id;
       }
 
       
       var self = this;
-
       this.$http
         .post(
           "usuario/marcaciones/" +
-            codigoMarcacion +
+            idEmpleado +
             "/" +
             mes +
             "/" +
@@ -152,13 +154,7 @@ export default {
             "Diciembre"
           ];
           let empleado = response.data.empleado;
-          let nombreCompleto =
-            (empleado.pnombre.length > 0 ? empleado.pnombre + " " : "") +
-            (empleado.snombre.length > 0 ? empleado.snombre + " " : "") +
-            (empleado.tnombre.length > 0 ? empleado.tnombre + " " : "") +
-            (empleado.papellido.length > 0 ? empleado.papellido + " " : "") +
-            (empleado.sapellido.length > 0 ? empleado.sapellido + " " : "") +
-            (empleado.tapellido.length > 0 ? empleado.tapellido + " " : "");
+          let nombreCompleto = empleado.nombreCompleto;
 
           //********************************************************
           //Seteando las variables locales del componente

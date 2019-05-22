@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginCpt from '@/components/Login'
 import MarcacionesCpt from '@/components/ConsultaMarcaciones/MarcacionesIndex'
+import AdminEmpleadosCpt from '@/components/AdminEmpleados/index'
 import MsjSesionRequeridaCpt from '@/components/MsjSesionRequerida'
 import RegistroCpt from '@/components/Registro'
 import ResetPassCpt from '@/components/ResetPass'
@@ -47,6 +48,11 @@ export default new VueRouter({
                     path:'consulta-marcaciones',
                     name:'ConsultaMarcaciones',
                     component:MarcacionesCpt
+                },
+                {
+                    path:'admin-empleados',
+                    name:'AdminEmpleados',
+                    component: AdminEmpleadosCpt
                 }
             ]
         }

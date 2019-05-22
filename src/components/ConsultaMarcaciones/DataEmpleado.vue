@@ -12,14 +12,14 @@
       <v-card-text>
         <v-list dense>
           <v-list-tile>
-            <v-list-tile-content class="align-left">Codigo de marcación</v-list-tile-content>
+            <v-list-tile-content class="align-left">Codigo de asistencia</v-list-tile-content>
             <v-list-tile-content class="align-end">
            <!--
                     <v-text-field
               v-model="dataEmpleado.codigoMarcacion"
               readonly
             ></v-text-field>-->
-              <b>{{dataEmpleado.codigoMarcacion}}</b>
+              <b>{{dataEmpleado.codAsistencia}}</b>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>

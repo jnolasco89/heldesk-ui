@@ -16,7 +16,7 @@
             <v-icon>home</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Marcaciones</v-list-tile-title>
+            <v-list-tile-title @click="navegarOpcionMenu(1)">Marcaciones</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile>
@@ -24,7 +24,7 @@
             <v-icon>contact_mail</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Reservaciones</v-list-tile-title>
+            <v-list-tile-title @click="navegarOpcionMenu(2)">Reservaciones</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -180,7 +180,20 @@ export default {
           break;
         }
       
+    },
+    navegarOpcionMenu:function(opcion){
+        switch(opcion){
+          case 1:
+            alert("ir a marcas");
+             this.$router.push({name:"ConsultaMarcaciones"})
+          break;
+          case 2:
+            alert("ir a admin");
+              this.$router.push({name:"AdminEmpleados"})
+          break;
+        }
     }
+
   }
 };
 </script>

@@ -50,6 +50,12 @@ export default {
          default:function(){
            return [];
          }
+       },
+       inituserselected:{
+         type:Number,
+         default:function(){
+           return 0;
+         }
        }
     },
     data() {
@@ -57,7 +63,7 @@ export default {
       fechaActual: new Date(),
       fecha: new Date().toISOString().substr(0, 10),
       datePickerVisible: false,
-      selectedEmpleado:0,
+      selectedEmpleado:this.inituserselected,
       usuarios: [
         /*
         { text: "Jose Nolasco", callback: () => console.log("jn") },
@@ -84,14 +90,20 @@ export default {
     cambioSeleccion:function(){
       this.$emit("cambioSeleccion",this.selectedEmpleado);
     }
-  },
+  }
+  /*
+  ,
   mounted(){
       let user=JSON.parse(localStorage.getItem("data-user"));
       if(user!=null){
         this.selectedEmpleado=user.id;
+        alert(user.id);
       }else if(this.supervisiones.length>0){
+        alert(JSON.stringify(user));
         this.selectedEmpleado=this.supervisiones[0].id;   
       }
+     this.selectedEmpleado=8989;
   }
+  */
 }
 </script>
