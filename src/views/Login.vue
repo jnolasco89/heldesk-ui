@@ -1,62 +1,64 @@
 <template>
-  <v-layout align-center justify-center row fill-height>
-    <v-flex xs10 sm6 md4 lg3 xl3>
-      <v-card class="elevation-12">
-        <v-toolbar dark color="primary">
-          <v-toolbar-title>Ingreso</v-toolbar-title>
-        </v-toolbar>
-        <v-card-text>
-          <v-form>
-            <v-text-field
-              label="NIT"
-              prepend-icon="person"
-              placeholder="0000-000000-000-0"
-              :mask="ui.mascarNit"
-              return-masked-value
-              v-model="data.nit"
-              data-vv-name="data.nit"
-              v-validate="'required|length:17'"
-              :error-messages="errors.collect('data.nit')"
-              required
-            ></v-text-field>
-            <v-text-field
-              label="Contraseña"
-              prepend-icon="lock"
-              placeholder=" "
-              :append-icon="ui.passVisible ? 'visibility_off' : 'visibility'"
-              :type="ui.passVisible ? 'text' : 'password'"
-              @click:append="ui.passVisible = !ui.passVisible"
-              v-model="data.password"
-              data-vv-name="data.password"
-              v-validate="'required'"
-              :error-messages="errors.collect('data.password')"
-              required
-            ></v-text-field>
-            <a @click="irAresetPass">Restablecer contraseña</a>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-layout justify-center>
-            <v-btn @click="login" color="primary" small>
-              Ingresar
-              <v-icon right dark>arrow_forward</v-icon>
-            </v-btn>
-          </v-layout>
-        </v-card-actions>
-      </v-card>
-      <v-alert v-show="ui.loginFallido" :value="true" color="error" icon="warning">{{ui.msjError}}</v-alert>
-      <v-expansion-panel v-show="ui.detallesError">
-        <v-expansion-panel-content expand-icon="keyboard_arrow_down">
-          <template v-slot:header>
-            <div>Detalle error</div>
-          </template>
-          <v-card>
-            <v-card-text class="grey lighten-3">{{ui.msjDetallesError}}</v-card-text>
-          </v-card>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-flex>
-  </v-layout>
+  <v-container fluid fill-height>
+    <v-layout align-center justify-center row fill-height>
+      <v-flex xs10 sm6 md4 lg3 xl3>
+        <v-card class="elevation-12">
+          <v-toolbar dark color="primary">
+            <v-toolbar-title>Ingreso</v-toolbar-title>
+          </v-toolbar>
+          <v-card-text>
+            <v-form>
+              <v-text-field
+                label="NIT"
+                prepend-icon="person"
+                placeholder="0000-000000-000-0"
+                :mask="ui.mascarNit"
+                return-masked-value
+                v-model="data.nit"
+                data-vv-name="data.nit"
+                v-validate="'required|length:17'"
+                :error-messages="errors.collect('data.nit')"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="Contraseña"
+                prepend-icon="vpn_key"
+                placeholder=" "
+                :append-icon="ui.passVisible ? 'visibility_off' : 'visibility'"
+                :type="ui.passVisible ? 'text' : 'password'"
+                @click:append="ui.passVisible = !ui.passVisible"
+                v-model="data.password"
+                data-vv-name="data.password"
+                v-validate="'required'"
+                :error-messages="errors.collect('data.password')"
+                required
+              ></v-text-field>
+              <a @click="irAresetPass">Restablecer contraseña</a>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-layout justify-center>
+              <v-btn @click="login" color="primary" small>
+                Ingresar
+                <v-icon right dark>arrow_forward</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-card-actions>
+        </v-card>
+        <v-alert v-show="ui.loginFallido" :value="true" color="error" icon="warning">{{ui.msjError}}</v-alert>
+        <v-expansion-panel v-show="ui.detallesError">
+          <v-expansion-panel-content expand-icon="keyboard_arrow_down">
+            <template v-slot:header>
+              <div>Detalle error</div>
+            </template>
+            <v-card>
+              <v-card-text class="grey lighten-3">{{ui.msjDetallesError}}</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 <script>
 export default {
@@ -109,7 +111,7 @@ export default {
     login: function() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          this.$eventBus.$emit("mostrarCargando",true);
+          this.$eventBus.$emit("mostrarCargando", true);
 
           var self = this;
           this.$http
@@ -118,26 +120,25 @@ export default {
               contrasenia: this.data.password
             })
             .then(response => {
-              
-              let dataUser={
-                id:response.data.id,
-                nit:response.data.nit,
-                codAsistencia:response.data.codigoAsistencia,
-                pnombre:response.data.pnombre,
-                snombre:response.data.snombre,
-                tnombre:response.data.tnombre,
-                papellido:response.data.papellido,
-                sapellido:response.data.sapellido,
-                tapellido:response.data.tapellido,
-                nombreCompleto:response.data.nombreCompleto
+              let dataUser = {
+                id: response.data.id,
+                nit: response.data.nit,
+                codAsistencia: response.data.codigoAsistencia,
+                pnombre: response.data.pnombre,
+                snombre: response.data.snombre,
+                tnombre: response.data.tnombre,
+                papellido: response.data.papellido,
+                sapellido: response.data.sapellido,
+                tapellido: response.data.tapellido,
+                nombreCompleto: response.data.nombreCompleto
               };
-              
-              localStorage.setItem("data-user", JSON.stringify( dataUser));
+
+              localStorage.setItem("data-user", JSON.stringify(dataUser));
               localStorage.setItem("t-a", response.headers.authorization);
-              this.$emit("loginCorrecto","ConsultaMarcaciones");
+              this.$emit("loginCorrecto", "ConsultaMarcaciones");
             })
             .catch(function(error) {
-              this.$eventBus.$emit("mostrarCargando",false);
+              this.$eventBus.$emit("mostrarCargando", false);
 
               switch (error.response.status) {
                 case 401:

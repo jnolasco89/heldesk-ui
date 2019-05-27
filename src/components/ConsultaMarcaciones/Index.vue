@@ -1,37 +1,45 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout row align-start justify-center fill-height>
+  <v-container fluid>
+    <v-layout align-start justify-center row fill-height>
       <v-flex xs12 sm12 md12>
-        <controles-marcacion v-on:cambioSeleccion="actualizarSelectedEmpleado" v-on:consultarMarcaciones="consultarMarcaciones" :supervisiones="dataSupervisiones" v-if="isLoadSupervisiones" :inituserselected="selectedEmpleado"></controles-marcacion>
+        <controles-marcacion
+          v-on:cambioSeleccion="actualizarSelectedEmpleado"
+          v-on:consultarMarcaciones="consultarMarcaciones"
+          :supervisiones="dataSupervisiones"
+          v-if="isLoadSupervisiones"
+          :inituserselected="selectedEmpleado"
+        ></controles-marcacion>
       </v-flex>
     </v-layout>
-    <v-layout row align-start justify-center>
-      <v-flex xs12 sm12 md6>
-        <marcacion-data-empleado
-          :data-empleado="dataEmpleado"
-          :mes="mesConsulta"
-          :anio="anioConsulta"
-        ></marcacion-data-empleado>
-      </v-flex>
-    </v-layout>
-    <v-layout row align-start justify-center>
-      <v-flex xs12 sm12 md12>
-        <v-container grid-list-md text-xs-center>
-          <v-layout row wrap align-center justify-center>
-            <v-flex xs12 sm6 md3>
-              <descriptor-de-colores :descriptores="descriptores"></descriptor-de-colores>
-            </v-flex>
-            <v-flex xs12 sm12 md12>
-              <marcacion-tabs
-                :data-tabla="dataTablaMarcaciones"
-                :data-calendario="dataCalendarioMarcaciones"
-                :today-calendar="fechaInicioCalendario"
-              ></marcacion-tabs>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-flex>
-    </v-layout>
+     <div v-if="marcasCargadas">
+      <v-layout row align-start justify-center>
+        <v-flex xs12 sm12 md6>
+          <marcacion-data-empleado
+            :data-empleado="dataEmpleado"
+            :mes="mesConsulta"
+            :anio="anioConsulta"
+          ></marcacion-data-empleado>
+        </v-flex>
+      </v-layout>
+      <v-layout row align-start justify-center>
+        <v-flex xs12 sm12 md12>
+          <v-container grid-list-md text-xs-center>
+            <v-layout row wrap align-center justify-center>
+              <v-flex xs12 sm6 md3>
+                <descriptor-de-colores :descriptores="descriptores"></descriptor-de-colores>
+              </v-flex>
+              <v-flex xs12 sm12 md12>
+                <marcacion-tabs
+                  :data-tabla="dataTablaMarcaciones"
+                  :data-calendario="dataCalendarioMarcaciones"
+                  :today-calendar="fechaInicioCalendario"
+                ></marcacion-tabs>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-flex>
+      </v-layout>
+    </div>
   </v-container>
 </template>
 <script>
@@ -50,9 +58,10 @@ export default {
   },
   data() {
     return {
-      selectedEmpleado:0,
-      isLoadSupervisiones:false,
-      dataSupervisiones:[],
+      selectedEmpleado: 0,
+      marcasCargadas:false,
+      isLoadSupervisiones: false,
+      dataSupervisiones: [],
       dataEmpleado: {
         codigoMarcacion: "",
         nit: "",
@@ -87,54 +96,44 @@ export default {
       ]
     };
   },
-  mounted(){
-    
-    
-    let user= JSON.parse(localStorage.getItem("data-user"))
+  mounted() {
+    let user = JSON.parse(localStorage.getItem("data-user"));
     this.$http
-    .get("usuario/supervisiones/"+user.id)
-    .then(response=>{
-        this.isLoadSupervisiones=true;
-        this.dataSupervisiones=response.data;
-        this.selectedEmpleado=user.id;
+      .get("usuario/supervisiones/" + user.id)
+      .then(response => {
+        this.isLoadSupervisiones = true;
+        this.dataSupervisiones = response.data;
+        this.selectedEmpleado = user.id;
 
-        if(response.data.length>0){
+        if (response.data.length > 0) {
           this.dataSupervisiones.unshift(user);
         }
-    
-        this.$eventBus.$emit("mostrarCargando",false);
-    })
-    .catch(error=>{
-          alert("ocurrio un error " + error);
-          this.$eventBus.$emit("mostrarCargando",false);
-    })
+
+        this.$eventBus.$emit("mostrarCargando", false);
+      })
+      .catch(error => {
+        alert("ocurrio un error " + error);
+        this.$eventBus.$emit("mostrarCargando", false);
+      });
   },
   methods: {
-    actualizarSelectedEmpleado:function(id){
-        this.selectedEmpleado=id;
+    actualizarSelectedEmpleado: function(id) {
+      this.selectedEmpleado = id;
     },
     consultarMarcaciones: function(mes, anio) {
       this.$eventBus.$emit("mostrarCargando", true);
-      let idEmpleado=0;
-      
-      if(this.dataSupervisiones.length>0 && this.isLoadSupervisiones){
-         idEmpleado= this.selectedEmpleado;
-      }else{
+      let idEmpleado = 0;
+
+      if (this.dataSupervisiones.length > 0 && this.isLoadSupervisiones) {
+        idEmpleado = this.selectedEmpleado;
+      } else {
         let userCookie = JSON.parse(localStorage.getItem("data-user"));
-        idEmpleado=userCookie.id;
+        idEmpleado = userCookie.id;
       }
 
-      
       var self = this;
       this.$http
-        .post(
-          "usuario/marcaciones/" +
-            idEmpleado +
-            "/" +
-            mes +
-            "/" +
-            anio
-        )
+        .post("usuario/marcaciones/" + idEmpleado + "/" + mes + "/" + anio)
         .then(response => {
           //********************************************************
           //Declarando variables utilitarias
@@ -159,7 +158,10 @@ export default {
           //********************************************************
           //Seteando las variables locales del componente
           //********************************************************
-          self.fechaInicioCalendario=self.$moment(new Date(anio,mes-1,1)).format("YYYY-MM-DD");
+
+          self.fechaInicioCalendario = self
+            .$moment(new Date(anio, mes - 1, 1))
+            .format("YYYY-MM-DD");
           self.mesConsulta = meses[mes - 1];
           self.anioConsulta = anio * 1;
           self.dataEmpleado = {
@@ -226,15 +228,19 @@ export default {
 
             //Agregando las marcaciones a la data
             dataParaCalendario.push({
-              tipo:tipoMarcacion,
-              key: "manana-"+self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+              tipo: tipoMarcacion,
+              key:
+                "manana-" +
+                self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
               turno: "Mañana",
               marcaciones: marcasManana,
               fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
             });
             dataParaCalendario.push({
-              tipo:tipoMarcacion,
-              key: "tarde-"+self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+              tipo: tipoMarcacion,
+              key:
+                "tarde-" +
+                self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
               turno: "Tarde",
               marcaciones: marcasTarde,
               fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
@@ -267,6 +273,7 @@ export default {
           };
 
           self.dataCalendarioMarcaciones = dataParaCalendario;
+          self.marcasCargadas=true;
 
           this.$eventBus.$emit("mostrarCargando", false);
         }) //Fin de THEN

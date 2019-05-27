@@ -1,4 +1,5 @@
 <template>
+  <v-container fluid fill-height>
     <v-layout align-center justify-center>
       <v-flex xs10 sm8 md5 lg4 xl3>
         <v-card class="elevation-12">
@@ -35,11 +36,13 @@
                 <v-icon dark left>arrow_back</v-icon>Atras
               </v-btn>
 
-              <v-btn color="primary" dark @click="limpiar()" small>Limpiar
+              <v-btn color="primary" dark @click="limpiar()" small>
+                Limpiar
                 <v-icon right dark>clear</v-icon>
               </v-btn>
 
-              <v-btn color="primary" dark @click="restablecer()" small>Enviar
+              <v-btn color="primary" dark @click="restablecer()" small>
+                Enviar
                 <v-icon right dark>send</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
@@ -48,6 +51,7 @@
         </v-card>
       </v-flex>
     </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -56,7 +60,7 @@ export default {
   data() {
     return {
       nit: "",
-      mascaraNit: '####-######-###-#',
+      mascaraNit: "####-######-###-#",
       dictionary: {
         attributes: {
           nit: "NIT"
@@ -75,24 +79,24 @@ export default {
   },
   mounted() {
     this.$validator.localize("en", this.dictionary);
-    this.$emit('componenteCargado',1)
+    this.$emit("componenteCargado", 1);
   },
   methods: {
-    irAvistaLogin: function () {
-        this.$router.push({name: 'Login'})
+    irAvistaLogin: function() {
+      this.$router.push({ name: "Login" });
     },
-    limpiar: function () {
-        this.nit=''
-        this.$validator.reset()
-    },  
+    limpiar: function() {
+      this.nit = "";
+      this.$validator.reset();
+    },
     restablecer: function() {
-       this.$validator.validateAll().then(result => {
-           if(result){
-               alert("Restablecer contra");
-           }else{
-               alert('validar bien');
-           }
-       }) 
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          alert("Restablecer contra");
+        } else {
+          alert("validar bien");
+        }
+      });
     }
   }
 };

@@ -54,12 +54,10 @@
                      v-on:mostrarCargando="mostrarCargando"
     ===============================================-->
     <v-content>
-      <v-container fluid fill-height>
         <router-view
           v-on:loginCorrecto="cargarVistaPrincipal"
           v-on:componenteCargado="configurarElementosVisibles"
         ></router-view>
-      </v-container>
     </v-content>
 
     <!-- ===========================================
