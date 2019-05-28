@@ -78,7 +78,7 @@
           <v-alert :value="true" color="error" icon="warning">No hay datos para mostrar</v-alert>
         </template>
         <template v-slot:pageText="propiedades">
-           {{ propiedades.pageStart }} - {{ propiedades.pageStop }} de {{ propiedades.itemsLenght }}
+           {{ propiedades.pageStart }} - {{ propiedades.pageStop }} de {{ propiedades.itemsLength }}
         </template>
       </v-data-table>
     </v-card-text>
@@ -88,6 +88,12 @@
 export default {
   name: "tabla-empleados",
   props: {
+    parametroBusqueda:{
+      type:String,
+      default:function(){
+        return "";
+      }
+    }
   },
   data() {
     return {
@@ -120,7 +126,7 @@ export default {
       handler(){
         this.getEmpleados().then(data=>{
           this.tabla.empleados=data.empleados;
-          this.tabla.totalEmpleados=100;
+          this.tabla.totalEmpleados=data.count;
         })
       },
       deep:true
@@ -155,9 +161,13 @@ export default {
         this.$http
           .get("usuario/empleados/"+indiceInicial+"/"+indiceFinal)
           .then(response => {
-            let empleados = response.data;
+
+            let count = response.data.count;
+            let empleados = response.data.empleados;
             this.tabla.isLoading=false;
+
             resolve({
+                count,
                 empleados
             })
           })
@@ -166,13 +176,30 @@ export default {
             this.$eventBus.$emit("mostrarCargando", false);
           });
       });
+    },
+    buscarEmpleado:function(){
+      
+      this.$eventBus.$emit("mostrarCargando", true);
+      this.$http
+      .get("find-empleado/"+this.parametroBusqueda)
+      .then(response=>{ 
+          alert(JSON.stringify(response.data));
+
+        this.$eventBus.$emit("mostrarCargando", false);
+      })
+      .catch(error=>{
+            alert(error);
+            this.$eventBus.$emit("mostrarCargando", false);
+      });
+      
+      
     }
   },
   mounted(){
       this.getEmpleados().then(data => {
          
          this.tabla.empleados=data.empleados;
-         this.tabla.totalEmpleados=100;
+         this.tabla.totalEmpleados=data.count;
      })
   }
 };
