@@ -43,7 +43,7 @@
           <v-icon>account_circle</v-icon>
           {{ui.nickName}}
         </v-btn>
-        <v-btn flat>
+        <v-btn flat @click="cerrarSesion">
           <v-icon>power_settings_new</v-icon>Salir
         </v-btn>
       </v-toolbar-items>
@@ -102,6 +102,10 @@ export default {
     this.$eventBus.$on("mostrarCargando", this.mostrarCargando);
   },
   methods: {
+    cerrarSesion:function(){
+      let user = JSON.parse(localStorage.getItem("data-user"));
+      alert("cerrar la sesion "+user.idSesion);
+    },
     armarNickName: function() {
       let nickName = "";
       let user = JSON.parse(localStorage.getItem("data-user"));

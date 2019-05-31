@@ -11,7 +11,7 @@
         ></controles-marcacion>
       </v-flex>
     </v-layout>
-     <div v-if="marcasCargadas">
+    <div v-if="marcasCargadas">
       <v-layout row align-start justify-center>
         <v-flex xs12 sm12 md6>
           <marcacion-data-empleado
@@ -40,6 +40,14 @@
         </v-flex>
       </v-layout>
     </div>
+    <div v-else-if="sinDatosParaLaConsulta">
+      <v-layout row align-start justify-center>
+        <v-flex xs12 sm12 md6>
+          <br>
+          <h2>No se encontro resultados para la consulta</h2>
+        </v-flex>
+      </v-layout>
+    </div>
   </v-container>
 </template>
 <script>
@@ -59,8 +67,9 @@ export default {
   data() {
     return {
       selectedEmpleado: 0,
-      marcasCargadas:false,
+      marcasCargadas: false,
       isLoadSupervisiones: false,
+      sinDatosParaLaConsulta: false,
       dataSupervisiones: [],
       dataEmpleado: {
         codigoMarcacion: "",
@@ -178,102 +187,111 @@ export default {
           //********************************************************
           let dataParaTabla = [];
           let dataParaCalendario = [];
-          let diasMarcaciones = response.data.meses[0].diasMes;
+          let diasMarcaciones = [];
 
-          diasMarcaciones.forEach(function(diaMarcacion) {
-            let marcasManana = [],
-              marcasTarde = [];
+          if (
+            response.data.meses != undefined &&
+            response.data.meses.length > 0
+          ) {
+            diasMarcaciones = response.data.meses[0].diasMes;
 
-            diaMarcacion.marcaciones.forEach(function(marcacion) {
-              //HH para formato de 24 horas
-              //hh para formato de 12 horas
-              let horaMarcacion = self.$moment(marcacion).format("HH") * 1;
+            diasMarcaciones.forEach(function(diaMarcacion) {
+              let marcasManana = [],
+                marcasTarde = [];
 
-              if (horaMarcacion <= 12) {
-                marcasManana.push(self.$moment(marcacion).format("hh:mm A"));
-              } else {
-                marcasTarde.push(self.$moment(marcacion).format("hh:mm A"));
+              diaMarcacion.marcaciones.forEach(function(marcacion) {
+                //HH para formato de 24 horas
+                //hh para formato de 12 horas
+                let horaMarcacion = self.$moment(marcacion).format("HH") * 1;
+
+                if (horaMarcacion <= 12) {
+                  marcasManana.push(self.$moment(marcacion).format("hh:mm A"));
+                } else {
+                  marcasTarde.push(self.$moment(marcacion).format("hh:mm A"));
+                }
+              }); //Fin forEach marcaciones
+
+              let tipoMarcacion = { id: 0, clase: "" };
+              if (marcasManana.length == 0 && marcasTarde.length == 0) {
+                //Sin marcaciones
+                tipoMarcacion.id = 1;
+                tipoMarcacion.clase = "sin-marcaciones";
+              } else if (
+                (marcasManana.length == 1 && marcasTarde.length == 0) ||
+                (marcasManana.length == 0 && marcasTarde.length == 1)
+              ) {
+                //Una marcacion ya sea en la mañana o en la tarde
+                tipoMarcacion.id = 2;
+                tipoMarcacion.clase = "una-marcacion-periodo";
+              } else if (
+                (marcasManana.length > 0 && marcasTarde.length == 0) ||
+                (marcasManana.length == 0 && marcasTarde.length > 0)
+              ) {
+                //Varias marcaciones solo en un tiempo del dia mañana o tarde
+                tipoMarcacion.id = 3;
+                tipoMarcacion.clase = "marcaciones-en-un-periodo";
+              } else if (marcasManana.length > 0 && marcasTarde.length > 0) {
+                //Maraciones en todo el dia
+                tipoMarcacion.id = 4;
+                tipoMarcacion.clase = "marcaciones-full";
               }
-            }); //Fin forEach marcaciones
 
-            let tipoMarcacion = { id: 0, clase: "" };
-            if (marcasManana.length == 0 && marcasTarde.length == 0) {
-              //Sin marcaciones
-              tipoMarcacion.id = 1;
-              tipoMarcacion.clase = "sin-marcaciones";
-            } else if (
-              (marcasManana.length == 1 && marcasTarde.length == 0) ||
-              (marcasManana.length == 0 && marcasTarde.length == 1)
-            ) {
-              //Una marcacion ya sea en la mañana o en la tarde
-              tipoMarcacion.id = 2;
-              tipoMarcacion.clase = "una-marcacion-periodo";
-            } else if (
-              (marcasManana.length > 0 && marcasTarde.length == 0) ||
-              (marcasManana.length == 0 && marcasTarde.length > 0)
-            ) {
-              //Varias marcaciones solo en un tiempo del dia mañana o tarde
-              tipoMarcacion.id = 3;
-              tipoMarcacion.clase = "marcaciones-en-un-periodo";
-            } else if (marcasManana.length > 0 && marcasTarde.length > 0) {
-              //Maraciones en todo el dia
-              tipoMarcacion.id = 4;
-              tipoMarcacion.clase = "marcaciones-full";
-            }
+              marcasManana =
+                marcasManana.length > 0 ? marcasManana : ["Sin marcaciones"];
+              marcasTarde =
+                marcasTarde.length > 0 ? marcasTarde : ["Sin marcaciones"];
 
-            marcasManana =
-              marcasManana.length > 0 ? marcasManana : ["Sin marcaciones"];
-            marcasTarde =
-              marcasTarde.length > 0 ? marcasTarde : ["Sin marcaciones"];
+              //Agregando las marcaciones a la data
+              dataParaCalendario.push({
+                tipo: tipoMarcacion,
+                key:
+                  "manana-" +
+                  self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+                turno: "Mañana",
+                marcaciones: marcasManana,
+                fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
+              });
+              dataParaCalendario.push({
+                tipo: tipoMarcacion,
+                key:
+                  "tarde-" +
+                  self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
+                turno: "Tarde",
+                marcaciones: marcasTarde,
+                fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
+              });
 
-            //Agregando las marcaciones a la data
-            dataParaCalendario.push({
-              tipo: tipoMarcacion,
-              key:
-                "manana-" +
-                self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
-              turno: "Mañana",
-              marcaciones: marcasManana,
-              fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
-            });
-            dataParaCalendario.push({
-              tipo: tipoMarcacion,
-              key:
-                "tarde-" +
-                self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD"),
-              turno: "Tarde",
-              marcaciones: marcasTarde,
-              fecha: self.$moment(diaMarcacion.fecha).format("YYYY-MM-DD")
-            });
+              dataParaTabla.push({
+                tipo: tipoMarcacion,
+                dia: diaMarcacion.diaDeLaSemana,
+                fecha: self.$moment(diaMarcacion.fecha).format("DD-MM-YYYY"),
+                manana: marcasManana,
+                tarde: marcasTarde
+              });
+            }); //Fin forEach diaMarcacion
 
-            dataParaTabla.push({
-              tipo: tipoMarcacion,
-              dia: diaMarcacion.diaDeLaSemana,
-              fecha: self.$moment(diaMarcacion.fecha).format("DD-MM-YYYY"),
-              manana: marcasManana,
-              tarde: marcasTarde
-            });
-          }); //Fin forEach diaMarcacion
+            self.dataTablaMarcaciones = {
+              cabeceras: [
+                { texto: "Dia", value: "dia" },
+                { texto: "Fecha", value: "fecha" },
+                { texto: "Manana", value: "manana" },
+                { texto: "Tarde", value: "tarde" }
+              ],
+              filtros: [
+                { id: 0, texto: "Todo" },
+                { id: 1, texto: "Inasistencia" },
+                { id: 2, texto: "Una marcacion" },
+                { id: 3, texto: "Marcaciones un tiempo" },
+                { id: 4, texto: "Laborados" }
+              ],
+              data: dataParaTabla
+            };
 
-          self.dataTablaMarcaciones = {
-            cabeceras: [
-              { texto: "Dia", value: "dia" },
-              { texto: "Fecha", value: "fecha" },
-              { texto: "Manana", value: "manana" },
-              { texto: "Tarde", value: "tarde" }
-            ],
-            filtros: [
-              { id: 0, texto: "Todo" },
-              { id: 1, texto: "Inasistencia" },
-              { id: 2, texto: "Una marcacion" },
-              { id: 3, texto: "Marcaciones un tiempo" },
-              { id: 4, texto: "Laborados" }
-            ],
-            data: dataParaTabla
-          };
-
-          self.dataCalendarioMarcaciones = dataParaCalendario;
-          self.marcasCargadas=true;
+            self.dataCalendarioMarcaciones = dataParaCalendario;
+            self.marcasCargadas = true;
+          } else {
+            self.sinDatosParaLaConsulta = true;
+          } //Fin de if para meses undefined o length cero
 
           this.$eventBus.$emit("mostrarCargando", false);
         }) //Fin de THEN

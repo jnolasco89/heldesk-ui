@@ -124,6 +124,7 @@ export default {
                 id: response.data.id,
                 nit: response.data.nit,
                 codAsistencia: response.data.codigoAsistencia,
+                idSesion: response.data.idSesion,
                 pnombre: response.data.pnombre,
                 snombre: response.data.snombre,
                 tnombre: response.data.tnombre,
@@ -132,7 +133,7 @@ export default {
                 tapellido: response.data.tapellido,
                 nombreCompleto: response.data.nombreCompleto
               };
-
+              
               localStorage.setItem("data-user", JSON.stringify(dataUser));
               localStorage.setItem("t-a", response.headers.authorization);
               this.$emit("loginCorrecto", "ConsultaMarcaciones");

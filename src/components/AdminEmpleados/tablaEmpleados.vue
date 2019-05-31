@@ -178,20 +178,20 @@ export default {
       });
     },
     buscarEmpleado:function(){
-      
+      alert(localStorage.getItem("t-a"));
       this.$eventBus.$emit("mostrarCargando", true);
-      this.$http
-      .get("find-empleado/"+this.parametroBusqueda)
-      .then(response=>{ 
+         this.$http
+          .get("find-empleado/jose")
+          .then(response => {
+
           alert(JSON.stringify(response.data));
 
         this.$eventBus.$emit("mostrarCargando", false);
-      })
-      .catch(error=>{
+          })
+          .catch(error => {
             alert(error);
             this.$eventBus.$emit("mostrarCargando", false);
-      });
-      
+          });
       
     }
   },
