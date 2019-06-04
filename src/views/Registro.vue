@@ -144,7 +144,42 @@ export default {
     registrar: function() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          alert("Correcto, registrar ahora!!");
+          this.$eventBus.$emit("mostrarCargando", true);
+          this.$http
+            .post("usuario/registrar-empleado", {
+              nit: this.nit,
+              correo: this.correo,
+              contrasenia: this.password
+            })
+            .then(response => {
+              this.$eventBus.$emit("mostrarCargando", false);
+              alert("Empleado registrado");
+            })
+            .catch(error => {
+              this.$eventBus.$emit("mostrarCargando", false);
+              console.log(JSON.stringify(error));
+              console.log(JSON.stringify(error.response));
+              switch (error.response.status) {
+                case 404:
+                  alert(error.response.data.error);
+                  break;
+                case 500:
+                  alert(error.response.data.error);
+                  break;
+                default:
+                  self.ui.detallesError = true;
+                  var descripcion = error.response.data.descripcion;
+                  var error = error.response.data.descripcion;
+                  var tipo = error.response.data.tipo;
+                  /*
+                  self.ui.msjError = error;
+                  self.ui.msjDetallesError =
+                    "Ha ocurrido un error: " + tipo + " , " + descripcion;
+*/
+                  alert(error);
+                  break;
+              }
+            });
         } else {
           alert("ERRORES arreglar");
         }

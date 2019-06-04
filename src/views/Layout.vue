@@ -54,10 +54,10 @@
                      v-on:mostrarCargando="mostrarCargando"
     ===============================================-->
     <v-content>
-        <router-view
-          v-on:loginCorrecto="cargarVistaPrincipal"
-          v-on:componenteCargado="configurarElementosVisibles"
-        ></router-view>
+      <router-view
+        v-on:loginCorrecto="cargarVistaPrincipal"
+        v-on:componenteCargado="configurarElementosVisibles"
+      ></router-view>
     </v-content>
 
     <!-- ===========================================
@@ -102,9 +102,17 @@ export default {
     this.$eventBus.$on("mostrarCargando", this.mostrarCargando);
   },
   methods: {
-    cerrarSesion:function(){
+    cerrarSesion: function() {
       let user = JSON.parse(localStorage.getItem("data-user"));
-      alert("cerrar la sesion "+user.idSesion);
+      
+      this.$http
+        .post("usuario/cerrar-sesion/" + user.idSesion)
+        .then(response => {
+          this.$router.push({name:"Login"});
+        })
+        .catch(function(error) {
+          alert("Error: " + JSON.stringify(error));
+        });
     },
     armarNickName: function() {
       let nickName = "";
